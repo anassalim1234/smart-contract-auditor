@@ -324,11 +324,11 @@ contract VulnerableBank {
   };
 
   const EXPLORER_KEYS={
-    eth:'YourEtherscanKey',
-    bnb:'YourBscscanKey',
-    polygon:'YourPolygonscanKey',
-    arb:'YourArbiscanKey',
-    base:'YourBasescanKey'
+    eth:'2XSGCJGW4S6RYVB6FKU8TKYWX3QRY8SZQA',
+    bnb:'2XSGCJGW4S6RYVB6FKU8TKYWX3QRY8SZQA',
+    polygon:'2XSGCJGW4S6RYVB6FKU8TKYWX3QRY8SZQA',
+    arb:'2XSGCJGW4S6RYVB6FKU8TKYWX3QRY8SZQA',
+    base:'2XSGCJGW4S6RYVB6FKU8TKYWX3QRY8SZQA'
   };
 
   let lastFetchedName='';
@@ -345,7 +345,8 @@ contract VulnerableBank {
     btn.disabled=true;
     setStatus('loading','⟳ Fetching source code from blockchain explorer...');
     try{
-      const url=`${EXPLORERS[chain]}?module=contract&action=getsourcecode&address=${address}&apikey=${EXPLORER_KEYS[chain]}`;
+      const CHAIN_IDS={eth:'1',bnb:'56',polygon:'137',arb:'42161',base:'8453'};
+const url=`${EXPLORERS[chain]}?chainid=${CHAIN_IDS[chain]}&module=contract&action=getsourcecode&address=${address}&apikey=${EXPLORER_KEYS[chain]}`;
       const res=await fetch(url);
       const data=await res.json();
       if(data.status==='1'&&data.result&&data.result[0].SourceCode){
