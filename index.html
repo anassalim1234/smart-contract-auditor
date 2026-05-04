@@ -1,353 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AuditAI — Smart Contract Security Scanner</title>
+  <title>Guardera — Blockchain Security AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Cinzel:wght@700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:      #0a0a0f;
-      --surface: #111118;
-      --border:  #1e1e2e;
-      --accent:  #00ff9d;
-      --accent2: #ff3c6e;
-      --warn:    #ffb800;
-      --info:    #4da6ff;
-      --text:    #e8e8f0;
-      --muted:   #6b6b80;
-      --mono:    'Space Mono', monospace;
-      --sans:    'Syne', sans-serif;
-    }
+    :root{--bg:#0a0a0f;--surface:#111118;--border:#1e1e2e;--accent:#00ff9d;--accent2:#ff3c6e;--warn:#ffb800;--info:#4da6ff;--text:#e8e8f0;--muted:#6b6b80;--mono:'Space Mono',monospace;--sans:'Inter',sans-serif;--display:'Cinzel',serif}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;font-weight:300}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,157,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,157,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+    .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 80px}
 
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
+    /* HEADER */
+    header{padding:48px 0 36px;display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid var(--border);margin-bottom:0}
+    .logo-wrap{display:flex;flex-direction:column;gap:6px}
+    .logo-row{display:flex;align-items:center;gap:12px}
+    .logo-line{width:36px;height:2px;background:linear-gradient(90deg,var(--accent),transparent)}
+    .logo-line-r{width:36px;height:2px;background:linear-gradient(270deg,var(--accent),transparent)}
+    .logo-diamond{width:7px;height:7px;background:var(--accent);transform:rotate(45deg);flex-shrink:0}
+    .logo-text{font-family:var(--display);font-size:42px;font-weight:900;letter-spacing:10px;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,#fff 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+    .logo-sub{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;padding-left:2px}
+    .header-badge{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;color:var(--accent);border:1px solid rgba(0,255,157,.25);padding:8px 14px;letter-spacing:1px;margin-top:6px}
+    .header-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      min-height: 100vh;
-    }
+    /* STATS */
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);margin-top:0}
+    .stat{background:var(--surface);padding:20px 24px}
+    .stat-value{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);margin-bottom:4px}
+    .stat-label{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
 
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none; z-index: 0;
-    }
+    /* CHAINS */
+    .chains{display:flex;align-items:center;gap:8px;padding:14px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;margin-bottom:40px}
+    .chains-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-right:4px}
+    .chain-badge{font-family:var(--mono);font-size:10px;color:var(--accent);border:1px solid rgba(0,255,157,.2);padding:3px 10px;background:rgba(0,255,157,.05)}
 
-    .container {
-      position: relative; z-index: 1;
-      max-width: 900px; margin: 0 auto; padding: 0 24px 80px;
-    }
+    /* SECTION */
+    .section-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+    .input-title{font-size:22px;font-weight:300;margin-bottom:18px;letter-spacing:.5px}
 
-    /* ── HEADER ─────────────────────────────── */
-    header {
-      padding: 48px 0 40px;
-      display: flex; align-items: flex-start; justify-content: space-between;
-      border-bottom: 1px solid var(--border); margin-bottom: 48px;
-    }
-    .logo { display: flex; flex-direction: column; gap: 4px; }
-    .logo-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
-    .logo-name span { color: var(--accent); }
-    .logo-tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+    /* ADDRESS BAR */
+    .address-bar{display:flex;align-items:center;border:1px solid var(--border);height:54px;margin-bottom:8px}
+    .address-bar:focus-within{border-color:rgba(0,255,157,.4)}
+    .chain-select{background:#0d0d14;border:none;border-right:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:11px;padding:0 12px;height:100%;outline:none;cursor:pointer;width:130px}
+    .chain-select.selected{color:var(--text)}
+    .address-field{flex:1;background:none;border:none;color:var(--text);font-family:var(--mono);font-size:12px;padding:0 16px;height:100%;outline:none}
+    .address-field::placeholder{color:var(--muted)}
+    .fetch-btn{background:transparent;border:none;border-left:1px solid var(--border);color:#fff;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:0 24px;height:100%;cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+    .fetch-btn:hover:not(:disabled){background:#fff;color:#000}
+    .fetch-btn:disabled{opacity:.4;cursor:not-allowed}
+    .fetch-status{font-family:var(--mono);font-size:12px;min-height:28px;padding:6px 0}
+    .fetch-status.success{color:var(--accent)}.fetch-status.error{color:var(--accent2)}.fetch-status.loading{color:var(--muted)}
 
-    .header-badge {
-      display: flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 11px; color: var(--accent);
-      border: 1px solid rgba(0,255,157,0.25); padding: 8px 14px; letter-spacing: 1px;
-    }
-    .header-badge::before {
-      content: ''; width: 6px; height: 6px; background: var(--accent);
-      border-radius: 50%; animation: pulse 2s infinite; flex-shrink: 0;
-    }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+    /* OR DIVIDER */
+    .or-divider{display:flex;align-items:center;gap:16px;margin:20px 0 12px;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 
-    /* ── STATS ──────────────────────────────── */
-    .stats {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      gap: 1px; background: var(--border); margin-bottom: 48px;
-    }
-    .stat { background: var(--surface); padding: 20px 24px; }
-    .stat-value { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
-    .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+    /* CODE BOX */
+    .code-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .code-label-text{font-size:12px;color:var(--muted);font-family:var(--mono)}
+    .example-btn{font-family:var(--mono);font-size:11px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:1px}
+    .example-btn:hover{color:var(--accent);border-color:var(--accent)}
+    textarea{width:100%;height:220px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;padding:20px;resize:vertical;outline:none;transition:border-color .2s;word-break:break-all}
+    textarea:focus{border-color:rgba(0,255,157,.4)}
+    textarea::placeholder{color:var(--muted)}
 
-    /* ── SECTION LABEL ──────────────────────── */
-    .section-label { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 12px; }
+    /* LEGAL */
+    .legal-box{background:rgba(255,184,0,.04);border:1px solid rgba(255,184,0,.15);padding:14px 18px;font-size:12px;color:#a0a090;line-height:1.7;margin-top:14px}
+    .legal-title{font-family:var(--mono);font-size:9px;color:var(--warn);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+    .legal-link{color:var(--accent);text-decoration:underline;cursor:pointer}
 
-    /* ── ADDRESS BAR ────────────────────────── */
-    .input-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+    /* BUTTONS */
+    .analyze-btn{width:100%;padding:18px;margin-top:16px;background:transparent;color:#fff;border:1px solid #fff;font-family:var(--sans);font-size:14px;font-weight:400;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:background .15s,color .15s;position:relative;overflow:hidden}
+    .analyze-btn:hover:not(:disabled){background:#fff;color:#000}
+    .analyze-btn:disabled{opacity:.4;cursor:not-allowed}
+    .analyze-btn .btn-text{transition:opacity .2s}
+    .analyze-btn .btn-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity .2s}
+    .analyze-btn.loading .btn-text{opacity:0}
+    .analyze-btn.loading .btn-loading{opacity:1}
+    .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    .address-bar {
-      display: flex; align-items: center;
-      border: 1px solid var(--border); height: 54px; margin-bottom: 8px;
-    }
-    .address-bar:focus-within { border-color: rgba(0,255,157,0.4); }
+    /* RESULTS */
+    #results{display:none;margin-top:48px}
+    #results.visible{display:block;animation:fadeUp .4s ease}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .results-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .results-title-wrap{display:flex;flex-direction:column;gap:4px}
+    .results-title{font-size:22px;font-weight:300;letter-spacing:.5px}
+    .results-subtitle{font-size:12px;color:var(--muted);font-family:var(--mono)}
+    .score-badge{font-family:var(--mono);font-size:11px;padding:6px 16px;font-weight:700;margin-top:4px}
+    .score-critical{background:rgba(255,60,110,.15);color:var(--accent2);border:1px solid rgba(255,60,110,.4)}
+    .score-high{background:rgba(255,112,67,.15);color:#ff7043;border:1px solid rgba(255,112,67,.4)}
+    .score-medium{background:rgba(255,184,0,.15);color:var(--warn);border:1px solid rgba(255,184,0,.4)}
+    .score-low{background:rgba(77,166,255,.15);color:var(--info);border:1px solid rgba(77,166,255,.4)}
+    .score-safe{background:rgba(0,255,157,.1);color:var(--accent);border:1px solid rgba(0,255,157,.3)}
+    .meaning-box{padding:18px 20px;margin-bottom:24px;border:1px solid}
+    .meaning-box.critical{background:rgba(255,60,110,.06);border-color:rgba(255,60,110,.2)}
+    .meaning-box.high{background:rgba(255,112,67,.06);border-color:rgba(255,112,67,.2)}
+    .meaning-box.medium{background:rgba(255,184,0,.06);border-color:rgba(255,184,0,.2)}
+    .meaning-box.low{background:rgba(77,166,255,.06);border-color:rgba(77,166,255,.2)}
+    .meaning-box.safe{background:rgba(0,255,157,.06);border-color:rgba(0,255,157,.2)}
+    .meaning-title{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+    .meaning-title.critical{color:var(--accent2)}.meaning-title.high{color:#ff7043}.meaning-title.medium{color:var(--warn)}.meaning-title.low{color:var(--info)}.meaning-title.safe{color:var(--accent)}
+    .meaning-text{font-size:13px;color:var(--text);line-height:1.7;font-weight:300}
+    .severity-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);margin-bottom:28px}
+    .severity-box{background:var(--surface);padding:16px;text-align:center}
+    .severity-count{font-family:var(--mono);font-size:28px;font-weight:700;margin-bottom:4px}
+    .severity-label{font-size:11px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+    .sev-critical{color:var(--accent2)}.sev-high{color:#ff7043}.sev-medium{color:var(--warn)}.sev-low{color:var(--info)}
+    .safe-center{text-align:center;padding:24px 0 16px}
+    .safe-icon{font-size:44px;margin-bottom:12px}
+    .safe-headline{font-size:20px;font-weight:300;color:var(--accent);margin-bottom:6px;letter-spacing:.5px}
+    .safe-sub{font-size:12px;color:var(--muted)}
+    .checks{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+    .check{display:flex;align-items:flex-start;gap:12px;background:var(--surface);padding:14px 16px;border:1px solid var(--border)}
+    .check-icon{color:var(--accent);font-size:13px;margin-top:1px;flex-shrink:0}
+    .check-title{font-size:13px;font-weight:400;color:var(--text);margin-bottom:2px}
+    .check-desc{font-size:12px;color:var(--muted);line-height:1.5}
+    .findings-list{display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+    .finding{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--border);padding:20px}
+    .finding.critical{border-left-color:var(--accent2)}.finding.high{border-left-color:#ff7043}.finding.medium{border-left-color:var(--warn)}.finding.low{border-left-color:var(--info)}.finding.info{border-left-color:var(--muted)}
+    .finding-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .finding-severity{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px}
+    .sev-tag-critical{background:rgba(255,60,110,.15);color:var(--accent2)}.sev-tag-high{background:rgba(255,112,67,.15);color:#ff7043}.sev-tag-medium{background:rgba(255,184,0,.15);color:var(--warn)}.sev-tag-low{background:rgba(77,166,255,.15);color:var(--info)}.sev-tag-info{background:rgba(107,107,128,.15);color:var(--muted)}
+    .finding-title{font-size:15px;font-weight:400}
+    .finding-description{font-size:13px;color:#a0a0b8;line-height:1.6;margin-bottom:12px;font-weight:300}
+    .finding-plain{background:rgba(255,255,255,.04);border-left:2px solid rgba(255,255,255,.1);padding:12px 16px;margin-bottom:12px}
+    .finding-plain-label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+    .finding-plain-text{font-size:13px;color:#c8c8d8;line-height:1.6;font-weight:300}
+    .finding-fix{background:rgba(0,255,157,.05);border:1px solid rgba(0,255,157,.15);padding:12px 16px;font-size:13px;color:rgba(0,255,157,.8);line-height:1.6;font-weight:300}
+    .finding-fix-label{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+    .raw-report{background:var(--surface);border:1px solid var(--border);padding:24px;font-family:var(--mono);font-size:12px;line-height:1.7;color:#a0a0b8;white-space:pre-wrap;word-break:break-word;margin-bottom:32px}
+    .error-box{background:rgba(255,60,110,.08);border:1px solid rgba(255,60,110,.25);padding:20px;font-family:var(--mono);font-size:13px;color:var(--accent2);line-height:1.6}
 
-    .chain-select {
-      background: #0d0d14;
-      border: none; border-right: 1px solid var(--border);
-      color: var(--muted); font-family: var(--mono); font-size: 12px;
-      padding: 0 12px; height: 100%; outline: none; cursor: pointer; width: 130px;
-    }
-    .chain-select.selected { color: var(--text); }
+    /* TERMS */
+    .terms-section{margin-top:48px;padding-top:32px;border-top:1px solid var(--border)}
+    .terms-title{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+    .terms-item{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:8px;font-weight:300}
+    .terms-item strong{color:#a0a0b8;font-weight:400}
 
-    .address-field {
-      flex: 1; background: none; border: none;
-      color: var(--text); font-family: var(--mono); font-size: 12px;
-      padding: 0 16px; height: 100%; outline: none;
-    }
-    .address-field::placeholder { color: var(--muted); }
-
-    .fetch-btn {
-      background: transparent;
-      border: none; border-left: 1px solid var(--border);
-      color: #ffffff; font-family: var(--mono); font-size: 11px;
-      font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      padding: 0 24px; height: 100%; cursor: pointer; white-space: nowrap;
-      transition: background 0.15s, color 0.15s;
-    }
-    .fetch-btn:hover:not(:disabled) { background: #ffffff; color: #000000; }
-    .fetch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .fetch-status {
-      font-family: var(--mono); font-size: 12px; min-height: 28px; padding: 6px 0;
-    }
-    .fetch-status.success { color: var(--accent); }
-    .fetch-status.error   { color: var(--accent2); }
-    .fetch-status.loading { color: var(--muted); }
-
-    /* ── OR DIVIDER ─────────────────────────── */
-    .or-divider {
-      display: flex; align-items: center; gap: 16px;
-      margin: 20px 0; font-family: var(--mono); font-size: 10px;
-      color: var(--muted); letter-spacing: 2px;
-    }
-    .or-divider::before, .or-divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
-    }
-
-    /* ── CODE BOX ───────────────────────────── */
-    .code-label {
-      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
-    }
-    .code-label-text { font-size: 13px; color: var(--muted); font-family: var(--mono); }
-
-    .example-btn {
-      font-family: var(--mono); font-size: 11px; color: var(--muted);
-      background: none; border: 1px solid var(--border); padding: 5px 12px;
-      cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
-    }
-    .example-btn:hover { color: var(--accent); border-color: var(--accent); }
-
-    textarea {
-      width: 100%; height: 220px;
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); font-family: var(--mono); font-size: 13px;
-      line-height: 1.6; padding: 20px; resize: vertical; outline: none;
-      transition: border-color 0.2s; word-break: break-all;
-    }
-    textarea:focus { border-color: rgba(0,255,157,0.4); }
-    textarea::placeholder { color: var(--muted); }
-
-    /* ── DISCLAIMER ─────────────────────────── */
-    .disclaimer {
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 14px 18px; font-size: 12px; color: var(--muted);
-      line-height: 1.6; margin-top: 14px;
-    }
-    .disclaimer strong { color: var(--warn); }
-
-    /* ── ANALYZE BUTTON ─────────────────────── */
-    .analyze-btn {
-      width: 100%; padding: 18px; margin-top: 16px;
-      background: transparent; color: #ffffff;
-      border: 1px solid #ffffff;
-      font-family: var(--sans); font-size: 15px; font-weight: 800;
-      letter-spacing: 2px; text-transform: uppercase;
-      cursor: pointer; transition: background 0.15s, color 0.15s;
-      position: relative; overflow: hidden;
-    }
-    .analyze-btn:hover:not(:disabled) { background: #ffffff; color: #000000; }
-    .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .analyze-btn .btn-text { transition: opacity 0.2s; }
-    .analyze-btn .btn-loading {
-      position: absolute; inset: 0; display: flex;
-      align-items: center; justify-content: center; gap: 8px;
-      opacity: 0; transition: opacity 0.2s;
-    }
-    .analyze-btn.loading .btn-text { opacity: 0; }
-    .analyze-btn.loading .btn-loading { opacity: 1; }
-    .spinner {
-      width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── RESULTS ────────────────────────────── */
-    #results { display: none; margin-top: 48px; }
-    #results.visible { display: block; animation: fadeUp 0.4s ease; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-
-    .results-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
-    }
-    .results-title { font-size: 20px; font-weight: 700; }
-
-    .score-badge { font-family: var(--mono); font-size: 12px; padding: 6px 16px; font-weight: 700; }
-    .score-safe   { background: rgba(0,255,157,0.1);  color: var(--accent);  border: 1px solid rgba(0,255,157,0.3); }
-    .score-warn   { background: rgba(255,184,0,0.1);  color: var(--warn);    border: 1px solid rgba(255,184,0,0.3); }
-    .score-danger { background: rgba(255,60,110,0.1); color: var(--accent2); border: 1px solid rgba(255,60,110,0.3); }
-
-    /* ── MEANING BOX ────────────────────────── */
-    .meaning-box {
-      padding: 18px 20px; margin-bottom: 24px; border: 1px solid;
-    }
-    .meaning-box.danger { background: rgba(255,60,110,0.06); border-color: rgba(255,60,110,0.2); }
-    .meaning-box.warn   { background: rgba(255,184,0,0.06);  border-color: rgba(255,184,0,0.2); }
-    .meaning-box.safe   { background: rgba(0,255,157,0.06);  border-color: rgba(0,255,157,0.2); }
-
-    .meaning-title { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
-    .meaning-title.danger { color: var(--accent2); }
-    .meaning-title.warn   { color: var(--warn); }
-    .meaning-title.safe   { color: var(--accent); }
-    .meaning-text { font-size: 13px; color: var(--text); font-family: var(--sans); line-height: 1.7; }
-
-    /* ── SEVERITY GRID ──────────────────────── */
-    .severity-grid {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      gap: 1px; background: var(--border); margin-bottom: 28px;
-    }
-    .severity-box { background: var(--surface); padding: 16px; text-align: center; }
-    .severity-count { font-family: var(--mono); font-size: 28px; font-weight: 700; margin-bottom: 4px; }
-    .severity-label { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
-    .sev-critical { color: var(--accent2); }
-    .sev-high     { color: #ff7043; }
-    .sev-medium   { color: var(--warn); }
-    .sev-low      { color: var(--info); }
-
-    /* ── SAFE CHECKS ────────────────────────── */
-    .safe-center { text-align: center; padding: 24px 0 16px; }
-    .safe-icon { font-size: 44px; margin-bottom: 12px; }
-    .safe-headline { font-size: 18px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
-    .safe-sub { font-size: 12px; color: var(--muted); }
-
-    .checks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
-    .check {
-      display: flex; align-items: flex-start; gap: 12px;
-      background: var(--surface); padding: 14px 16px; border: 1px solid var(--border);
-    }
-    .check-icon { color: var(--accent); font-size: 13px; margin-top: 1px; flex-shrink: 0; }
-    .check-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-    .check-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
-
-    /* ── FINDINGS ───────────────────────────── */
-    .findings-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-
-    .finding {
-      background: var(--surface); border: 1px solid var(--border);
-      border-left: 3px solid var(--border); padding: 20px;
-    }
-    .finding.critical { border-left-color: var(--accent2); }
-    .finding.high     { border-left-color: #ff7043; }
-    .finding.medium   { border-left-color: var(--warn); }
-    .finding.low      { border-left-color: var(--info); }
-    .finding.info     { border-left-color: var(--muted); }
-
-    .finding-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-    .finding-severity {
-      font-family: var(--mono); font-size: 10px; font-weight: 700;
-      letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 8px;
-    }
-    .sev-tag-critical { background: rgba(255,60,110,0.15);  color: var(--accent2); }
-    .sev-tag-high     { background: rgba(255,112,67,0.15);  color: #ff7043; }
-    .sev-tag-medium   { background: rgba(255,184,0,0.15);   color: var(--warn); }
-    .sev-tag-low      { background: rgba(77,166,255,0.15);  color: var(--info); }
-    .sev-tag-info     { background: rgba(107,107,128,0.15); color: var(--muted); }
-
-    .finding-title { font-size: 15px; font-weight: 600; }
-    .finding-description { font-size: 13px; color: #a0a0b8; line-height: 1.6; margin-bottom: 12px; }
-
-    .finding-plain {
-      background: rgba(255,255,255,0.04);
-      border-left: 2px solid rgba(255,255,255,0.1);
-      padding: 12px 16px; margin-bottom: 12px;
-    }
-    .finding-plain-label {
-      font-family: var(--mono); font-size: 9px; color: var(--muted);
-      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;
-    }
-    .finding-plain-text { font-size: 13px; color: #c8c8d8; font-family: var(--sans); line-height: 1.6; }
-
-    .finding-fix {
-      background: rgba(0,255,157,0.05); border: 1px solid rgba(0,255,157,0.15);
-      padding: 12px 16px; font-size: 13px; color: rgba(0,255,157,0.8); line-height: 1.6;
-    }
-    .finding-fix-label {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--accent); margin-bottom: 4px;
-    }
-
-    /* ── RAW REPORT ─────────────────────────── */
-    .raw-report {
-      background: var(--surface); border: 1px solid var(--border); padding: 24px;
-      font-family: var(--mono); font-size: 12px; line-height: 1.7; color: #a0a0b8;
-      white-space: pre-wrap; word-break: break-word; margin-bottom: 32px;
-    }
-
-    /* ── ERROR ──────────────────────────────── */
-    .error-box {
-      background: rgba(255,60,110,0.08); border: 1px solid rgba(255,60,110,0.25);
-      padding: 20px; font-family: var(--mono); font-size: 13px;
-      color: var(--accent2); line-height: 1.6;
-    }
-
-    @media (max-width: 600px) {
-      .stats { grid-template-columns: 1fr; }
-      .severity-grid { grid-template-columns: repeat(2,1fr); }
-      header { flex-direction: column; gap: 16px; }
-      .address-bar { flex-wrap: wrap; height: auto; }
-      .fetch-btn { width: 100%; border-left: none; border-top: 1px solid var(--border); padding: 12px; }
-    }
+    @media(max-width:600px){.stats{grid-template-columns:1fr}.severity-grid{grid-template-columns:repeat(2,1fr)}header{flex-direction:column;gap:16px}}
   </style>
 </head>
 <body>
 <div class="container">
 
-  <!-- HEADER -->
   <header>
-    <div class="logo">
-      <div class="logo-name">Audit<span>AI</span></div>
-      <div class="logo-tag">Smart Contract Security Scanner</div>
+    <div class="logo-wrap">
+      <div class="logo-row">
+        <div class="logo-diamond"></div>
+        <div class="logo-line"></div>
+        <div class="logo-text">GUARDERA</div>
+        <div class="logo-line-r"></div>
+        <div class="logo-diamond"></div>
+      </div>
+      <div class="logo-sub">Blockchain Security AI</div>
     </div>
-    <div class="header-badge">LIVE — Built by Anas Abuqasem</div>
+    <div class="header-badge">LIVE — Blockchain Security AI</div>
   </header>
 
-  <!-- STATS -->
   <div class="stats">
-    <div class="stat">
-      <div class="stat-value">10+</div>
-      <div class="stat-label">Vulnerability Types Detected</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">&lt;30s</div>
-      <div class="stat-label">Avg. Scan Time</div>
-    </div>
-    <div class="stat">
-      <div class="stat-value">FREE</div>
-      <div class="stat-label">No Signup Needed</div>
-    </div>
+    <div class="stat"><div class="stat-value">15+</div><div class="stat-label">Vulnerability Types Detected</div></div>
+    <div class="stat"><div class="stat-value">&lt;60s</div><div class="stat-label">Avg. Scan Time</div></div>
+    <div class="stat"><div class="stat-value">FREE</div><div class="stat-label">No Signup Needed</div></div>
   </div>
 
-  <!-- INPUT -->
+  <div class="chains">
+    <span class="chains-label">Supported:</span>
+    <span class="chain-badge">ETH</span>
+    <span class="chain-badge">BNB</span>
+    <span class="chain-badge">POLYGON</span>
+    <span class="chain-badge">ARBITRUM</span>
+    <span class="chain-badge">BASE</span>
+  </div>
+
   <div class="section-label">01 — Input</div>
-  <div class="input-title">Paste Your Contract Address</div>
+  <div class="input-title">Audit Any Smart Contract</div>
 
   <div class="address-bar">
     <select class="chain-select" id="chainSelect" onchange="this.classList.add('selected')">
@@ -358,112 +190,107 @@
       <option value="arb">ARB — Arbitrum</option>
       <option value="base">BASE — Base</option>
     </select>
-    <input
-      class="address-field"
-      id="contractAddress"
-      placeholder="0x92aa03137385f18539301349dcfc9ebc923ffb10"
-    />
-    <button class="fetch-btn" id="fetchBtn" onclick="fetchCode()">Fetch Code →</button>
+    <input class="address-field" id="contractAddress" placeholder="0x92aa03137385f18539301349dcfc9ebc923ffb10"/>
+    <button class="fetch-btn" id="fetchBtn" onclick="fetchCode()">CHECK SAFETY →</button>
   </div>
-
   <div class="fetch-status" id="fetchStatus"></div>
 
   <div class="or-divider">OR PASTE SOLIDITY CODE DIRECTLY</div>
 
-  <div class="code-label">
+  <div class="code-label-row">
     <span class="code-label-text">Solidity Code</span>
     <button class="example-btn" onclick="loadExample()">LOAD EXAMPLE</button>
   </div>
-
-  <textarea
-    id="contractCode"
-    placeholder="// Paste your Solidity smart contract here...
+  <textarea id="contractCode" placeholder="// Paste your Solidity smart contract here...
 // Example:
 // pragma solidity ^0.8.0;
-// contract MyToken { ... }"
-    spellcheck="false"
-  ></textarea>
+// contract MyToken { ... }" spellcheck="false"></textarea>
 
-  <div class="disclaimer">
-    <strong>⚠ Important:</strong> This tool is for educational and development purposes only.
-    Always get a professional audit from firms like CertiK before deploying to mainnet.
-    AI-generated results may not catch every vulnerability.
+  <div class="legal-box">
+    <div class="legal-title">Legal Disclaimer</div>
+    Guardera provides automated AI analysis for informational purposes only. This is not a professional security audit. Do not make investment or deployment decisions based solely on these results. Guardera and its creator accept no liability for any financial loss, security breach, or damages resulting from use of this tool. By using this tool you agree to our <a class="legal-link" href="#terms">Terms of Use</a>.
   </div>
 
   <button class="analyze-btn" id="analyzeBtn" onclick="runAudit()">
     <span class="btn-text">ANALYZE CONTRACT</span>
-    <span class="btn-loading">
-      <span class="spinner"></span>
-      SCANNING FOR VULNERABILITIES...
-    </span>
+    <span class="btn-loading"><span class="spinner"></span>SCANNING FOR VULNERABILITIES...</span>
   </button>
 
-  <!-- RESULTS -->
   <div id="results">
     <div class="results-header">
-      <div>
+      <div class="results-title-wrap">
         <div class="section-label">02 — Audit Report</div>
-        <div class="results-title">Security Analysis Complete</div>
+        <div class="results-title" id="resultsTitle">Security Analysis Complete</div>
+        <div class="results-subtitle" id="resultsSubtitle"></div>
       </div>
       <div class="score-badge" id="scoreBadge">—</div>
     </div>
-
     <div id="errorBox" class="error-box" style="display:none;"></div>
     <div id="meaningBox" style="display:none;"></div>
-
     <div class="severity-grid" id="severityGrid" style="display:none;">
       <div class="severity-box"><div class="severity-count sev-critical" id="countCritical">0</div><div class="severity-label">Critical</div></div>
       <div class="severity-box"><div class="severity-count sev-high" id="countHigh">0</div><div class="severity-label">High</div></div>
       <div class="severity-box"><div class="severity-count sev-medium" id="countMedium">0</div><div class="severity-label">Medium</div></div>
       <div class="severity-box"><div class="severity-count sev-low" id="countLow">0</div><div class="severity-label">Low</div></div>
     </div>
-
     <div id="safeSection" style="display:none;">
       <div class="safe-center">
         <div class="safe-icon">🛡️</div>
-        <div class="safe-headline">No Critical Vulnerabilities Found</div>
-        <div class="safe-sub">This contract passed all major security checks.</div>
+        <div class="safe-headline">No Vulnerabilities Found</div>
+        <div class="safe-sub">This contract passed all security checks.</div>
       </div>
-      <div class="checks" id="safeChecks"></div>
+      <div class="checks">
+        <div class="check"><div class="check-icon">✓</div><div><div class="check-title">No Reentrancy Vulnerabilities</div><div class="check-desc">Funds cannot be drained through repeated withdrawals.</div></div></div>
+        <div class="check"><div class="check-icon">✓</div><div><div class="check-title">Access Control Properly Set</div><div class="check-desc">Only authorized addresses can perform sensitive operations.</div></div></div>
+        <div class="check"><div class="check-icon">✓</div><div><div class="check-title">No Integer Overflow Risk</div><div class="check-desc">Math operations are protected against overflow exploits.</div></div></div>
+        <div class="check"><div class="check-icon">✓</div><div><div class="check-title">No Unlimited Minting</div><div class="check-desc">Token supply cannot be inflated by unauthorized parties.</div></div></div>
+      </div>
     </div>
-
     <div id="findingsList" class="findings-list"></div>
-
     <div id="rawReportSection" style="display:none;">
       <div class="section-label">Full Report</div>
       <div class="raw-report" id="rawReport"></div>
     </div>
   </div>
 
-</div>
+  <div class="terms-section" id="terms">
+    <div class="terms-title">Terms of Use</div>
+    <div class="terms-item"><strong>No Professional Advice —</strong> Results are AI-generated for informational purposes only. Not a certified audit.</div>
+    <div class="terms-item"><strong>No Guarantee —</strong> AI analysis may be incomplete or miss vulnerabilities. Always consult a professional before deploying contracts or investing.</div>
+    <div class="terms-item"><strong>No Liability —</strong> Guardera and its creator accept zero liability for any financial loss, security breach, or damages resulting from use of this tool.</div>
+    <div class="terms-item"><strong>Use at Your Own Risk —</strong> You accept full responsibility for any actions taken based on results from this tool.</div>
+    <div class="terms-item"><strong>Not Financial Advice —</strong> Nothing on this platform constitutes a recommendation to buy, sell, or invest in any token or asset.</div>
+  </div>
 
+</div>
 <script>
-  // ── PLAIN ENGLISH EXPLANATIONS ───────────────
-  const PLAIN_ENGLISH = {
-    'reentrancy': 'Imagine a broken ATM that gives you cash before recording the withdrawal — someone could keep pressing the button and empty the machine. This contract has the same flaw.',
-    'access control': 'Anyone can perform actions that should be restricted to the owner only — like leaving the keys to a vault on the front desk.',
-    'integer overflow': 'The math in this contract can wrap around to zero or a huge number unexpectedly — like an odometer that flips back to 0 after 999,999 miles.',
-    'timestamp': 'The contract uses the clock to make decisions, but miners who process transactions can slightly adjust that clock to cheat the system.',
-    'denial of service': 'A bad actor could permanently block this contract from working — like jamming a door so nobody can enter or leave.',
-    'unchecked': 'The contract ignores whether an important operation succeeded or failed — like sending money without confirming the transfer went through.',
-    'front-running': 'Miners can see your transaction before it goes through and insert their own first to profit — like someone cutting in line after seeing your lottery ticket.',
-    'selfdestruct': 'Someone could permanently destroy this entire contract and all its funds with a single call.',
-    'uninitialized': 'A variable was never set up properly — it defaults to zero or empty, which can cause unexpected behavior.',
-    'gas': 'This contract wastes unnecessary processing power, making transactions more expensive for users than they need to be.',
-    'error messages': 'When something goes wrong, the contract just says "no" with no explanation — like an ATM that declines your card without telling you why.',
-    'default': 'This issue could affect how the contract behaves in unexpected ways. Review the technical details above or consult a security expert.'
+  const PLAIN_ENGLISH={
+    'reentrancy':"Imagine a broken ATM that gives cash before recording the withdrawal — someone could keep pressing the button and empty it. This contract has the same flaw.",
+    'access control':"Anyone can do things only the owner should be able to do — like leaving the keys to a vault on the front desk for anyone to grab.",
+    'mint':"Anyone can create unlimited new coins from this contract — like a money printer with no lock. This would instantly crash the token's value.",
+    'overflow':"The math in this contract can silently wrap around to zero or a huge number — like an odometer that flips back to 0 after 999,999 miles.",
+    'timestamp':"The contract uses the clock to make decisions, but miners can slightly adjust that clock to cheat the system.",
+    'denial':"A bad actor could permanently block this contract from working — like jamming a revolving door so nobody can enter or leave.",
+    'unchecked':"The contract ignores whether an important action succeeded or failed — like sending money and never checking if it actually arrived.",
+    'front-run':"Miners can see your transaction before it goes through and insert their own first to profit — like someone cutting in line after seeing your order.",
+    'selfdestruct':"Someone could permanently delete this entire contract and all its funds with a single command.",
+    'gas':"This contract wastes unnecessary computing power, making every transaction more expensive than it needs to be.",
+    'event':"The contract keeps no activity log — like a bank with no transaction history. Not dangerous but makes it impossible to track what happened.",
+    'visibility':"Some parts of the contract are visible to the public when they should be private — like leaving sensitive documents in a shop window.",
+    'integer':"Numbers in this contract can exceed their maximum value and silently reset to zero — which can be exploited to bypass balance checks.",
+    'lock':"Ether sent to this contract could be permanently trapped with no way to get it out.",
+    'flash':"An attacker could borrow a huge amount of funds for a single transaction to manipulate prices and drain the contract.",
+    'logic':"The contract contains a mistake in its rules that could be exploited to behave in unintended ways.",
+    'default':"This issue could affect how the contract behaves unexpectedly. Ask the developers to review this finding."
   };
 
-  function getPlainEnglish(title, description) {
-    const text = (title + ' ' + description).toLowerCase();
-    for (const [key, explanation] of Object.entries(PLAIN_ENGLISH)) {
-      if (text.includes(key)) return explanation;
-    }
+  function getPlainEnglish(title,desc){
+    const t=(title+' '+desc).toLowerCase();
+    for(const[k,v]of Object.entries(PLAIN_ENGLISH)){if(t.includes(k))return v;}
     return PLAIN_ENGLISH['default'];
   }
 
-  // ── EXAMPLE CONTRACT ─────────────────────────
-  const EXAMPLE_CONTRACT = `// SPDX-License-Identifier: MIT
+  const EXAMPLE=`// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract VulnerableBank {
@@ -474,7 +301,6 @@ contract VulnerableBank {
     }
 
     // VULNERABILITY: Reentrancy attack possible here
-    // The balance is updated AFTER the external call
     function withdraw(uint256 amount) public {
         require(balances[msg.sender] >= amount, "Insufficient balance");
         (bool success, ) = msg.sender.call{value: amount}("");
@@ -487,342 +313,184 @@ contract VulnerableBank {
     }
 }`;
 
-  function loadExample() {
-    document.getElementById('contractCode').value = EXAMPLE_CONTRACT;
-  }
+  function loadExample(){document.getElementById('contractCode').value=EXAMPLE;}
 
-  // ── CHAIN EXPLORER APIS ───────────────────────
-  const EXPLORERS = {
-    eth:     { url: 'https://api.etherscan.io/api',     key: 'YourEtherscanKey' },
-    bnb:     { url: 'https://api.bscscan.com/api',      key: 'YourBscscanKey' },
-    polygon: { url: 'https://api.polygonscan.com/api',  key: 'YourPolygonscanKey' },
-    arb:     { url: 'https://api.arbiscan.io/api',      key: 'YourArbiscanKey' },
-    base:    { url: 'https://api.basescan.org/api',     key: 'YourBasescanKey' },
+  const EXPLORERS={
+    eth:'https://api.etherscan.io/api',
+    bnb:'https://api.bscscan.com/api',
+    polygon:'https://api.polygonscan.com/api',
+    arb:'https://api.arbiscan.io/api',
+    base:'https://api.basescan.org/api'
   };
 
-  async function fetchCode() {
-    const chain = document.getElementById('chainSelect').value;
-    const address = document.getElementById('contractAddress').value.trim();
-    const fetchBtn = document.getElementById('fetchBtn');
+  const EXPLORER_KEYS={
+    eth:'YourEtherscanKey',
+    bnb:'YourBscscanKey',
+    polygon:'YourPolygonscanKey',
+    arb:'YourArbiscanKey',
+    base:'YourBasescanKey'
+  };
 
-    if (!chain) { setStatus('error', '✗ Please select a chain first.'); return; }
-    if (!address) { setStatus('error', '✗ Please enter a contract address.'); return; }
-    if (!/^0x[a-fA-F0-9]{40}$/.test(address)) { setStatus('error', '✗ Invalid address format. Must start with 0x followed by 40 characters.'); return; }
+  let lastFetchedName='';
+  let lastFetchedAddress='';
+  let lastFetchedChain='';
 
-    fetchBtn.disabled = true;
-    setStatus('loading', '⟳ Fetching source code from blockchain explorer...');
-
-    try {
-      const { url, key } = EXPLORERS[chain];
-      const res = await fetch(`${url}?module=contract&action=getsourcecode&address=${address}&apikey=${key}`);
-      const data = await res.json();
-
-      if (data.status === '1' && data.result && data.result[0].SourceCode) {
-        let src = data.result[0].SourceCode;
-        if (src.startsWith('{{')) {
-          try {
-            const parsed = JSON.parse(src.slice(1, -1));
-            const files = Object.values(parsed.sources || parsed);
-            src = files.map(f => f.content).join('\n\n');
-          } catch(e) {}
-        }
-        document.getElementById('contractCode').value = src;
-        setStatus('success', `✓ Source code fetched — ${data.result[0].ContractName || 'Contract'}`);
-      } else {
-        setStatus('error', '✗ Source code not verified on this explorer. Try pasting the Solidity code directly below.');
+  async function fetchCode(){
+    const chain=document.getElementById('chainSelect').value;
+    const address=document.getElementById('contractAddress').value.trim();
+    const btn=document.getElementById('fetchBtn');
+    if(!chain){setStatus('error','✗ Please select a chain first.');return;}
+    if(!address){setStatus('error','✗ Please enter a contract address.');return;}
+    if(!/^0x[a-fA-F0-9]{40}$/.test(address)){setStatus('error','✗ Invalid address format.');return;}
+    btn.disabled=true;
+    setStatus('loading','⟳ Fetching source code from blockchain explorer...');
+    try{
+      const url=`${EXPLORERS[chain]}?module=contract&action=getsourcecode&address=${address}&apikey=${EXPLORER_KEYS[chain]}`;
+      const res=await fetch(url);
+      const data=await res.json();
+      if(data.status==='1'&&data.result&&data.result[0].SourceCode){
+        let src=data.result[0].SourceCode;
+        if(src.startsWith('{{')){try{const p=JSON.parse(src.slice(1,-1));src=Object.values(p.sources||p).map(f=>f.content).join('\n\n');}catch(e){}}
+        document.getElementById('contractCode').value=src;
+        lastFetchedName=data.result[0].ContractName||'Contract';
+        lastFetchedAddress=address;
+        lastFetchedChain=chain.toUpperCase();
+        setStatus('success',`✓ Source code fetched — ${lastFetchedName}`);
+      }else{
+        setStatus('error','✗ Source code not verified on this explorer. Paste the Solidity code directly.');
       }
-    } catch(e) {
-      setStatus('error', '✗ Could not connect to the blockchain explorer. Try pasting the code directly.');
-    } finally {
-      fetchBtn.disabled = false;
+    }catch(e){setStatus('error','✗ Could not connect to explorer. Paste the code directly.');}
+    finally{btn.disabled=false;}
+  }
+
+  function setStatus(type,msg){
+    const el=document.getElementById('fetchStatus');
+    el.className='fetch-status '+type;
+    el.textContent=msg;
+  }
+
+  async function runAudit(){
+    const code=document.getElementById('contractCode').value.trim();
+    if(!code){alert('Please paste a contract or fetch one by address first.');return;}
+    const btn=document.getElementById('analyzeBtn');
+    btn.classList.add('loading');btn.disabled=true;
+    document.getElementById('results').classList.remove('visible');
+    try{
+      const res=await fetch('/api/audit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+      const result=await res.json();
+      displayResults(result,code);
+    }catch(e){
+      displayResults({success:false,error:'Network error: Could not reach the audit server.'},code);
+    }finally{
+      btn.classList.remove('loading');btn.disabled=false;
     }
   }
 
-  function setStatus(type, msg) {
-    const el = document.getElementById('fetchStatus');
-    el.className = 'fetch-status ' + type;
-    el.textContent = msg;
-  }
+  function displayResults(result,code){
+    const rd=document.getElementById('results');
+    document.getElementById('errorBox').style.display='none';
+    document.getElementById('meaningBox').style.display='none';
+    document.getElementById('severityGrid').style.display='none';
+    document.getElementById('safeSection').style.display='none';
+    document.getElementById('findingsList').innerHTML='';
+    document.getElementById('rawReportSection').style.display='none';
 
-  // ── AUDIT ─────────────────────────────────────
-  async function runAudit() {
-    const code = document.getElementById('contractCode').value.trim();
-    if (!code) { alert('Please paste a contract or fetch one by address first.'); return; }
-
-    const btn = document.getElementById('analyzeBtn');
-    btn.classList.add('loading');
-    btn.disabled = true;
-
-    const resultsDiv = document.getElementById('results');
-    resultsDiv.classList.remove('visible');
-
-    try {
-      const response = await fetch('/api/audit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code })
-      });
-      const result = await response.json();
-      displayResults(result);
-    } catch(err) {
-      displayResults({ success: false, error: 'Network error: Could not reach the audit server.' });
-    } finally {
-      btn.classList.remove('loading');
-      btn.disabled = false;
-    }
-  }
-
-  // ── DISPLAY RESULTS ───────────────────────────
-  function displayResults(result) {
-    const resultsDiv = document.getElementById('results');
-    const errorBox = document.getElementById('errorBox');
-    const meaningBox = document.getElementById('meaningBox');
-    const severityGrid = document.getElementById('severityGrid');
-    const findingsList = document.getElementById('findingsList');
-    const safeSection = document.getElementById('safeSection');
-    const rawReportSection = document.getElementById('rawReportSection');
-
-    errorBox.style.display = 'none';
-    meaningBox.style.display = 'none';
-    severityGrid.style.display = 'none';
-    safeSection.style.display = 'none';
-    findingsList.innerHTML = '';
-    rawReportSection.style.display = 'none';
-
-    if (!result.success) {
-      errorBox.textContent = '✗ Error: ' + (result.error || 'Unknown error');
-      errorBox.style.display = 'block';
-      resultsDiv.classList.add('visible');
-      return;
+    // Set title based on contract name or address
+    if(lastFetchedName){
+      document.getElementById('resultsTitle').textContent=`Audit Complete: ${lastFetchedName}`;
+      document.getElementById('resultsSubtitle').textContent=`${lastFetchedAddress.slice(0,6)}...${lastFetchedAddress.slice(-4)} · ${lastFetchedChain}`;
+    }else{
+      document.getElementById('resultsTitle').textContent='Security Analysis Complete';
+      document.getElementById('resultsSubtitle').textContent='';
     }
 
-    const data = result.data;
-    const findings = extractFindings(data);
-
-    if (findings && findings.length > 0) {
-      const counts = { critical:0, high:0, medium:0, low:0 };
-      findings.forEach(f => {
-        const s = (f.severity || 'low').toLowerCase();
-        if (counts[s] !== undefined) counts[s]++;
-      });
-
-      document.getElementById('countCritical').textContent = counts.critical;
-      document.getElementById('countHigh').textContent = counts.high;
-      document.getElementById('countMedium').textContent = counts.medium;
-      document.getElementById('countLow').textContent = counts.low;
-      severityGrid.style.display = 'grid';
-
-      const scoreBadge = document.getElementById('scoreBadge');
-
-      if (counts.critical > 0) {
-        scoreBadge.textContent = '⚠ CRITICAL ISSUES FOUND';
-        scoreBadge.className = 'score-badge score-danger';
-        showMeaning('danger', '⚠ What does this mean for me?',
-          `This contract has <strong style="color:#ff3c6e">critical security issues</strong>. If you are considering investing in this token, be very careful — a hacker could exploit these vulnerabilities to steal funds from the contract. Do not send large amounts of money to this contract until the developers fix these issues.`);
-      } else if (counts.high > 0) {
-        scoreBadge.textContent = '⚠ HIGH RISK';
-        scoreBadge.className = 'score-badge score-warn';
-        showMeaning('warn', '⚠ What does this mean for me?',
-          `This contract has <strong style="color:#ffb800">high-risk vulnerabilities</strong>. While not immediately critical, these issues could be exploited. If you are considering investing, proceed with caution and check if the developers are aware of these issues.`);
-      } else if (counts.medium > 0) {
-        scoreBadge.textContent = '⚠ MEDIUM RISK';
-        scoreBadge.className = 'score-badge score-warn';
-        showMeaning('warn', '⚠ What does this mean for me?',
-          `This contract has some <strong style="color:#ffb800">medium-level issues</strong>. These are not immediately dangerous but should be fixed before the contract handles large amounts of money.`);
-      } else {
-        scoreBadge.textContent = '✓ LOW RISK';
-        scoreBadge.className = 'score-badge score-safe';
-        showMeaning('safe', '✓ What does this mean for me?',
-          `This contract appears to be <strong style="color:#00ff9d">relatively safe</strong>. Only minor issues were found. This does not guarantee it is 100% safe — always do your own research before investing.`);
-      }
-
-      findings.forEach(f => {
-        const sev = (f.severity || 'info').toLowerCase();
-        const plain = getPlainEnglish(f.title || '', f.description || '');
-        const el = document.createElement('div');
-        el.className = `finding ${sev}`;
-        el.innerHTML = `
-          <div class="finding-top">
-            <span class="finding-severity sev-tag-${sev}">${sev}</span>
-            <span class="finding-title">${escHtml(f.title || 'Vulnerability Found')}</span>
-          </div>
-          <div class="finding-description">${escHtml(f.description || '')}</div>
-          <div class="finding-plain">
-            <div class="finding-plain-label">In plain English</div>
-            <div class="finding-plain-text">${escHtml(plain)}</div>
-          </div>
-          ${f.fix ? `<div class="finding-fix"><div class="finding-fix-label">Recommended Fix</div>${escHtml(f.fix)}</div>` : ''}
-        `;
-        findingsList.appendChild(el);
-      });
-
-    } else {
-      // Raw text response from ChainGPT — parse it
-      const rawText = typeof data === 'string' ? data : (data.result || JSON.stringify(data, null, 2));
-      const parsed = parseRawReport(rawText);
-
-      if (parsed.length > 0) {
-        const counts = { critical:0, high:0, medium:0, low:0 };
-        parsed.forEach(f => { const s=(f.severity||'low').toLowerCase(); if(counts[s]!==undefined) counts[s]++; });
-        document.getElementById('countCritical').textContent = counts.critical;
-        document.getElementById('countHigh').textContent = counts.high;
-        document.getElementById('countMedium').textContent = counts.medium;
-        document.getElementById('countLow').textContent = counts.low;
-        severityGrid.style.display = 'grid';
-
-        const scoreBadge = document.getElementById('scoreBadge');
-        if (counts.critical > 0) {
-          scoreBadge.textContent = '⚠ CRITICAL ISSUES FOUND';
-          scoreBadge.className = 'score-badge score-danger';
-          showMeaning('danger', '⚠ What does this mean for me?',
-            `This contract has <strong style="color:#ff3c6e">critical security issues</strong>. If you are considering investing in this token, be very careful — a hacker could exploit these vulnerabilities to steal funds from the contract.`);
-        } else if (counts.high > 0) {
-          scoreBadge.textContent = '⚠ HIGH RISK';
-          scoreBadge.className = 'score-badge score-warn';
-          showMeaning('warn', '⚠ What does this mean for me?',
-            `This contract has <strong style="color:#ffb800">high-risk vulnerabilities</strong>. Proceed with caution if considering investing.`);
-        } else {
-          scoreBadge.textContent = '✓ LOW RISK';
-          scoreBadge.className = 'score-badge score-safe';
-          showSafeSection();
-          showMeaning('safe', '✓ What does this mean for me?',
-            `This contract appears to be <strong style="color:#00ff9d">relatively safe</strong>. No critical issues found. Always do your own research before investing.`);
-        }
-
-        parsed.forEach(f => {
-          const sev = (f.severity || 'info').toLowerCase();
-          const plain = getPlainEnglish(f.title || '', f.description || '');
-          const el = document.createElement('div');
-          el.className = `finding ${sev}`;
-          el.innerHTML = `
-            <div class="finding-top">
-              <span class="finding-severity sev-tag-${sev}">${sev}</span>
-              <span class="finding-title">${escHtml(f.title || 'Finding')}</span>
-            </div>
-            <div class="finding-description">${escHtml(f.description || '')}</div>
-            <div class="finding-plain">
-              <div class="finding-plain-label">In plain English</div>
-              <div class="finding-plain-text">${escHtml(plain)}</div>
-            </div>
-            ${f.fix ? `<div class="finding-fix"><div class="finding-fix-label">Recommended Fix</div>${escHtml(f.fix)}</div>` : ''}
-          `;
-          findingsList.appendChild(el);
-        });
-
-      } else {
-        document.getElementById('rawReport').textContent = rawText;
-        rawReportSection.style.display = 'block';
-        const scoreBadge = document.getElementById('scoreBadge');
-        scoreBadge.textContent = 'REPORT GENERATED';
-        scoreBadge.className = 'score-badge score-safe';
-      }
+    if(!result.success){
+      const eb=document.getElementById('errorBox');
+      eb.textContent='✗ Error: '+(result.error||'Unknown error');
+      eb.style.display='block';
+      rd.classList.add('visible');return;
     }
 
-    resultsDiv.classList.add('visible');
-    resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const findings=result.data&&result.data.findings;
+    if(findings&&Array.isArray(findings)&&findings.length>0){
+      renderFindings(findings);
+    }else if(result.data&&result.data.result){
+      document.getElementById('rawReport').textContent=result.data.result;
+      document.getElementById('rawReportSection').style.display='block';
+      const sb=document.getElementById('scoreBadge');
+      sb.textContent='REPORT GENERATED';sb.className='score-badge score-low';
+    }else{
+      renderFindings([]);
+    }
+    rd.classList.add('visible');
+    rd.scrollIntoView({behavior:'smooth',block:'start'});
   }
 
-  function showMeaning(type, title, text) {
-    const el = document.getElementById('meaningBox');
-    el.className = `meaning-box ${type}`;
-    el.innerHTML = `
-      <div class="meaning-title ${type}">${title}</div>
-      <div class="meaning-text">${text}</div>
-    `;
-    el.style.display = 'block';
-  }
+  function renderFindings(findings){
+    const counts={critical:0,high:0,medium:0,low:0,info:0};
+    findings.forEach(f=>{const s=(f.severity||'info').toLowerCase();if(counts[s]!==undefined)counts[s]++;});
+    document.getElementById('countCritical').textContent=counts.critical;
+    document.getElementById('countHigh').textContent=counts.high;
+    document.getElementById('countMedium').textContent=counts.medium;
+    document.getElementById('countLow').textContent=counts.low;
+    document.getElementById('severityGrid').style.display='grid';
 
-  function showSafeSection() {
-    const checks = [
-      { title: 'No Reentrancy Vulnerabilities', desc: 'Funds cannot be drained through repeated withdrawals.' },
-      { title: 'Access Control Properly Set', desc: 'Only authorized addresses can perform sensitive operations.' },
-      { title: 'No Integer Overflow Risk', desc: 'Math operations are protected against overflow exploits.' },
-      { title: 'No Unlimited Minting', desc: 'Token supply cannot be inflated by unauthorized parties.' },
-    ];
-    const el = document.getElementById('safeChecks');
-    el.innerHTML = checks.map(c => `
-      <div class="check">
-        <div class="check-icon">✓</div>
-        <div>
-          <div class="check-title">${c.title}</div>
-          <div class="check-desc">${c.desc}</div>
+    const sb=document.getElementById('scoreBadge');
+    const mb=document.getElementById('meaningBox');
+    let badge,bClass,mType,mTitle,mText;
+
+    if(counts.critical>0){
+      badge='🔴 CRITICAL RISK';bClass='score-critical';mType='critical';
+      mTitle='⚠ What does this mean for me?';
+      mText='This contract has <strong style="color:#ff3c6e">critical security vulnerabilities</strong>. A hacker could exploit these to steal all funds. <strong>Do not invest or interact with this contract</strong> until developers fix these issues.';
+    }else if(counts.high>0){
+      badge='🟠 HIGH RISK';bClass='score-high';mType='high';
+      mTitle='⚠ What does this mean for me?';
+      mText='This contract has <strong style="color:#ff7043">high-risk vulnerabilities</strong>. These are serious issues that could be exploited. Proceed with extreme caution if considering investing.';
+    }else if(counts.medium>0){
+      badge='🟡 MEDIUM RISK';bClass='score-medium';mType='medium';
+      mTitle='⚠ What does this mean for me?';
+      mText='This contract has <strong style="color:#ffb800">medium-level issues</strong>. Not immediately dangerous but should be fixed before this contract handles large amounts of money.';
+    }else if(counts.low>0||counts.info>0){
+      badge='🔵 LOW RISK';bClass='score-low';mType='low';
+      mTitle='✓ What does this mean for me?';
+      mText='This contract has only <strong style="color:#4da6ff">minor issues</strong>. No serious vulnerabilities found. The contract appears to be safely written overall.';
+    }else{
+      badge='🟢 SAFE';bClass='score-safe';mType='safe';
+      mTitle='✓ What does this mean for me?';
+      mText='This contract appears to be <strong style="color:#00ff9d">clean and safely written</strong>. No vulnerabilities were detected. Always do your own research before investing.';
+      document.getElementById('safeSection').style.display='block';
+    }
+
+    sb.textContent=badge;sb.className=`score-badge ${bClass}`;
+    mb.className=`meaning-box ${mType}`;
+    mb.innerHTML=`<div class="meaning-title ${mType}">${mTitle}</div><div class="meaning-text">${mText}</div>`;
+    mb.style.display='block';
+
+    const list=document.getElementById('findingsList');
+    findings.forEach(f=>{
+      const sev=(f.severity||'info').toLowerCase();
+      const plain=getPlainEnglish(f.title||'',f.description||'');
+      const el=document.createElement('div');
+      el.className=`finding ${sev}`;
+      el.innerHTML=`
+        <div class="finding-top">
+          <span class="finding-severity sev-tag-${sev}">${sev}</span>
+          <span class="finding-title">${escHtml(f.title||'Finding')}</span>
         </div>
-      </div>
-    `).join('');
-    document.getElementById('safeSection').style.display = 'block';
+        <div class="finding-description">${escHtml(f.description||'')}</div>
+        <div class="finding-plain">
+          <div class="finding-plain-label">In plain English</div>
+          <div class="finding-plain-text">${escHtml(plain)}</div>
+        </div>
+        ${f.fix?`<div class="finding-fix"><div class="finding-fix-label">Recommended Fix</div>${escHtml(f.fix)}</div>`:''}
+      `;
+      list.appendChild(el);
+    });
   }
 
-  // ── PARSE RAW TEXT REPORT ─────────────────────
-  function parseRawReport(text) {
-    const findings = [];
-    const lines = text.split('\n');
-    let current = null;
-
-    const sevMap = {
-      'critical': 'critical', 'high': 'high',
-      'medium': 'medium',     'low': 'low', 'informational': 'info'
-    };
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
-
-      // Detect severity headers like "1. **Reentrancy Vulnerability:**" or "**Critical:** ..."
-      const headerMatch = line.match(/^\d+\.\s+\*{0,2}(.+?)\*{0,2}:?\s*$/);
-      const boldMatch = line.match(/^\*{1,2}(.+?)\*{1,2}:?\s*$/);
-
-      let sev = 'medium';
-      const lineLower = line.toLowerCase();
-      for (const [key, val] of Object.entries(sevMap)) {
-        if (lineLower.includes(key)) { sev = val; break; }
-      }
-
-      if (headerMatch || boldMatch) {
-        if (current) findings.push(current);
-        current = {
-          severity: sev,
-          title: (headerMatch || boldMatch)[1].replace(/\*/g, '').trim(),
-          description: '',
-          fix: ''
-        };
-      } else if (current) {
-        const lower = line.toLowerCase();
-        if (lower.startsWith('recommendation') || lower.startsWith('fix') || lower.startsWith('suggestion')) {
-          current.fix += line.replace(/^(recommendation|fix|suggestion):?\s*/i, '') + ' ';
-        } else {
-          current.description += line + ' ';
-        }
-      }
-    }
-    if (current) findings.push(current);
-
-    return findings.filter(f => f.title && f.title.length > 2).map(f => ({
-      ...f,
-      description: f.description.trim(),
-      fix: f.fix.trim()
-    }));
-  }
-
-  function extractFindings(data) {
-    try {
-      if (data.findings && Array.isArray(data.findings)) return data.findings;
-      if (data.vulnerabilities && Array.isArray(data.vulnerabilities)) {
-        return data.vulnerabilities.map(v => ({
-          severity: v.severity || v.level || 'medium',
-          title: v.name || v.title || v.type || 'Vulnerability',
-          description: v.description || v.details || '',
-          fix: v.recommendation || v.fix || v.remediation || ''
-        }));
-      }
-      if (data.issues && Array.isArray(data.issues)) return data.issues;
-    } catch(e) { return null; }
-    return null;
-  }
-
-  function escHtml(str) {
-    return String(str)
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  function escHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 </script>
 </body>
